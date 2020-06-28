@@ -62,7 +62,7 @@ module.exports = async (context) => {
         }
 
         // We only want to auto merge on the start here repo, return all others silently
-        // if (context.payload.repository.name !== "start-here-guidelines") return;
+        if (context.payload.repository.name !== "start-here-guidelines") return;
 
         // We now want to check a bunch of criteria, and comment any failures.
 
