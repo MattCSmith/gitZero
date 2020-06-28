@@ -28,13 +28,15 @@ module.exports = async (context) => {
         addLabel(context, "Conflict Present");
         makeComment(context, "conflict");
     }
-    if (prObject.data.mergeable === null)
+    if (prObject.data.mergeable === null) {
         context.logMe(
             context,
             "MERGABLE STATE UNKNOWN",
             `The state of [this PR](${context.payload.pull_request.html_url}) is unknown!`,
             10028130
         );
+    }
+
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     //                  IF PULL REQ CONFLICT FREE                    //
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
