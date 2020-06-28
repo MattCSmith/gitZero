@@ -38,18 +38,19 @@ module.exports = async (context) => {
         // Removing a label will trigger an unlabel action causing this to double run
 
         if (context.payload.action !== "unlabeled") {
-            if (labelNames.includes("Conflict Present"))
+            if (labelNames.includes("Conflict Present")) {
                 context.github.issues.removeLabel(
                     context.issue({
                         name: "Conflict Present",
                     })
                 );
-            context.logMe(
-                context,
-                "REMOVING LABEL",
-                `The \`${labelName}\` label is being removed [this PR](${context.payload.pull_request.html_url})`,
-                10028130
-            );
+                context.logMe(
+                    context,
+                    "REMOVING LABEL",
+                    `The \`Conflict Present\` label is being removed [this PR](${context.payload.pull_request.html_url})`,
+                    10028130
+                );
+            }
         }
 
         // We only want to auto merge on the start here repo, return all others silently
