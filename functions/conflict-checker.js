@@ -3,6 +3,9 @@ const addLabel = require("../functions/add-label.function");
 
 module.exports = async (context) => {
     context.log("## CONFLICT CHECKING ##");
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     //                    REFETCH THE PULLREQUEST                    //
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
@@ -13,6 +16,8 @@ module.exports = async (context) => {
         .then((data) => {
             return data;
         });
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Extract labels names from their objects
     const labelsArray = context.payload.pull_request.labels;
@@ -27,8 +32,7 @@ module.exports = async (context) => {
     if (prObject.data.mergeable === false) {
         addLabel(context, "Conflict Present");
         makeComment(context, "conflict");
-    }
-    if (prObject.data.mergeable === null) {
+    } else if (prObject.data.mergeable === null) {
         context.logMe(
             context,
             "MERGABLE STATE UNKNOWN",
