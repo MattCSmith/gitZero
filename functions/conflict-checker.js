@@ -105,7 +105,7 @@ module.exports = async (context) => {
             );
         } else {
             // Check if the event action is "pr opened", since we only want to send the message when the PR was first opened
-            if (context.action !== "opened") return;
+            // if (context.action !== "opened") return;
 
             context.logMe(
                 context,
