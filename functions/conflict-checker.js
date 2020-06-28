@@ -105,7 +105,6 @@ module.exports = async (context) => {
             );
         } else {
             // Check if the event action is "pr opened", since we only want to send the message when the PR was first opened
-            // if (context.action !== "opened") return;
 
             context.logMe(
                 context,
@@ -113,10 +112,11 @@ module.exports = async (context) => {
                 `[This PR did not pass the criteria to merged automatically!](${context.payload.pull_request.html_url}) \nAdditions: ${autoMergeChecks.additions} \nDeletions: ${autoMergeChecks.deletions} \nFile Count: ${autoMergeChecks.fileCount}, \nFile Names: ${autoMergeChecks.fileNames}`,
                 14505216
             );
+            if (context.action !== "opened") return;
 
             const issueComment = context.issue({
                 body:
-                    `🙏 Thanks for your pull request @${prObject.data.user.login}, The @zeroDevs/management-team will now review and merge this request. In the mean time why not check out some of the other opensource projects available, contributions are greatly appreciated!\n\n` +
+                    `🙏 Thanks for your pull request @${prObject.data.user.login}, The team will now review and merge this request. In the mean time why not check out some of the other opensource projects available, contributions are greatly appreciated!\n\n` +
                     `Some of the most popular are \n- [Student Resources](https://github.com/zero-to-mastery/resources) \n- [ZTM Job Board](https://github.com/zero-to-mastery/ZtM-Job-Board) \n- [Complete Web Developer Manual](https://github.com/zero-to-mastery/complete-web-developer-manual)\n\n` +
                     "--- \n### PR Statistics \n" +
                     `| #️⃣ **PR Number:** | ➕ **Line Additions:** |🗑️ **Line Deletions:** |\n` +
