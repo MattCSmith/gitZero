@@ -17,7 +17,7 @@ module.exports = async (context) => {
             return data;
         });
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Extract labels names from their objects
     const labelsArray = context.payload.pull_request.labels;
