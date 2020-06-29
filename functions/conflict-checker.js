@@ -47,8 +47,8 @@ module.exports = async (context) => {
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     // If the PR is mergable we should:
     //  1. Remove the conflict label
-    //  2. Thank the user for their PR & Offer next steps
-    //  3. Auto Merge PR, If criteria is met
+    //  3. Thank the user for their PR & Offer next steps
+    //  2. Auto Merge PR, If criteria is met
     else {
         // 1. Lets remove the Conflict Label if one is present
         // Removing a label will trigger an unlabel action, causing this to double run
@@ -68,10 +68,7 @@ module.exports = async (context) => {
             }
         }
 
-        // 2. Thank the user for their PR and provide options
-        prSuccess(context, prObject, autoMergeChecks);
-
-        // 3. Check if we should auto merge
+        // 2. Check if we should auto merge
         // The criteria is:
         //  - No More than 3 line additions
         //  - No more than 1 line deletion
@@ -128,5 +125,8 @@ module.exports = async (context) => {
                 14505216
             );
         }
+
+        // 3. Thank the user for their PR and provide options
+        prSuccess(context, prObject, autoMergeChecks);
     }
 };
