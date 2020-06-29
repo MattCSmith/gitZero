@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 module.exports = async (data) => {
-    const { title, desc, color } = data;
+    const { title, desc, color, footer } = data;
 
     axios
         .post(process.env.DISCORD_WEBHOOK, {
@@ -14,6 +14,9 @@ module.exports = async (data) => {
                     thumbnail: {
                         url:
                             "https://github.githubassets.com/images/modules/logos_page/Octocat.png",
+                    },
+                    footer: {
+                        text: footer,
                     },
                 },
             ],
