@@ -131,16 +131,16 @@ module.exports = async (context) => {
             context.github.pulls.merge(context.issue());
             context.logMe(
                 context,
-                "Auto-Merged PR\n",
-                `[This PR was successfully merged automatically!](${context.payload.pull_request.html_url}) \nAdditions: ${autoMergeChecks.additions} \nDeletions: ${autoMergeChecks.deletions} \nFile Count: ${autoMergeChecks.fileCount}, \nFile Names: ${autoMergeChecks.fileNames}`,
+                `Auto-Merged PR #${context.payload.number}\n`,
+                `[This PR was successfully merged automatically!](${context.payload.pull_request.html_url}) \n**Repo:** \` ${context.payload.pull_request.head.repo.name} \` \n**PR Title:** \` ${context.payload.pull_request.tile} \` \n**Additions:** \` ${autoMergeChecks.additions} \` | **Deletions:** \` ${autoMergeChecks.deletions} \` | **File Count:** \` ${autoMergeChecks.fileCount} \`, \n**File Names:** \` ${autoMergeChecks.fileNames} \` `,
                 56782
             );
         } else {
             // Otherwise Log when a pull request cant be merged automatically
             context.logMe(
                 context,
-                "Unable To Auto-Merge PR\n",
-                `[This PR did not pass the criteria to merged automatically!](${context.payload.pull_request.html_url}) \nAdditions: ${autoMergeChecks.additions} \nDeletions: ${autoMergeChecks.deletions} \nFile Count: ${autoMergeChecks.fileCount}, \nFile Names: ${autoMergeChecks.fileNames}`,
+                `Unable To Auto-Merge PR #${context.payload.number}\n`,
+                `[This PR did not pass the criteria to merged automatically!](${context.payload.pull_request.html_url}) \n**Repo:** \` ${context.payload.pull_request.head.repo.name} \` \n**PR Title:** \` ${context.payload.pull_request.tile} \` \n**Additions:** \` ${autoMergeChecks.additions} \` | **Deletions:** \` ${autoMergeChecks.deletions} \` | **File Count:** \` ${autoMergeChecks.fileCount} \`, \n**File Names:** \` ${autoMergeChecks.fileNames} \` `,
                 14505216
             );
         }
