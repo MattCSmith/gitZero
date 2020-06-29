@@ -1,5 +1,6 @@
 const makeComment = require("../functions/make-comment.function");
 const addLabel = require("../functions/add-label.function");
+const prSuccess = require("../languages/thanks-for-the-pr");
 
 module.exports = async (context) => {
     context.log("## CONFLICT CHECKING ##");
@@ -48,7 +49,6 @@ module.exports = async (context) => {
     // on certain repos, auto merge
     else {
         // Removing a label will trigger an unlabel action causing this to double run
-
         if (context.payload.action !== "unlabeled") {
             if (labelNames.includes("Conflict Present")) {
                 context.github.issues.removeLabel(
@@ -64,6 +64,9 @@ module.exports = async (context) => {
                 );
             }
         }
+
+        // Thank the user for their PR and provide options
+        prSuccess(context, prObject, autoMergeChecks);
 
         // We only want to auto merge on the start here repo, return all others silently
         if (context.payload.repository.name !== "start-here-guidelines") return;
@@ -89,8 +92,8 @@ module.exports = async (context) => {
             autoMergeChecks.fileNames.push(file.filename)
         );
 
-        if (autoMergeChecks.additions > 2) autoMergeChecks.status = false;
-        if (autoMergeChecks.deletions > 0) autoMergeChecks.status = false;
+        if (autoMergeChecks.additions > 3) autoMergeChecks.status = false;
+        if (autoMergeChecks.deletions > 1) autoMergeChecks.status = false;
         if (autoMergeChecks.fileCount > 1) autoMergeChecks.status = false;
         if (!autoMergeChecks.fileNames.includes("CONTRIBUTORS.md"))
             autoMergeChecks.status = false;
@@ -104,30 +107,13 @@ module.exports = async (context) => {
                 56782
             );
         } else {
-            // Check if the event action is "pr opened", since we only want to send the message when the PR was first opened
-
+            // Log when a pull request cant be merged automatically
             context.logMe(
                 context,
                 "Unable To Auto-Merge PR\n",
                 `[This PR did not pass the criteria to merged automatically!](${context.payload.pull_request.html_url}) \nAdditions: ${autoMergeChecks.additions} \nDeletions: ${autoMergeChecks.deletions} \nFile Count: ${autoMergeChecks.fileCount}, \nFile Names: ${autoMergeChecks.fileNames}`,
                 14505216
             );
-            if (context.action !== "opened") return;
-
-            const issueComment = context.issue({
-                body:
-                    `🙏 Thanks for your pull request @${prObject.data.user.login}, The team will now review and merge this request. In the mean time why not check out some of the other opensource projects available, contributions are greatly appreciated!\n\n` +
-                    `Some of the most popular are \n- [Student Resources](https://github.com/zero-to-mastery/resources) \n- [ZTM Job Board](https://github.com/zero-to-mastery/ZtM-Job-Board) \n- [Complete Web Developer Manual](https://github.com/zero-to-mastery/complete-web-developer-manual)\n\n` +
-                    "--- \n### PR Statistics \n" +
-                    `| #️⃣ **PR Number:** | ➕ **Line Additions:** |🗑️ **Line Deletions:** |\n` +
-                    `| :---: | :---: | :---: | \n` +
-                    `| ${prObject.data.number} |  ${autoMergeChecks.additions} | ${autoMergeChecks.deletions} | \n\n` +
-                    `| 📑 **Files Changed:** |   ⭐ **Repo Stars:**   | 🔱 **Total Forks:** |\n` +
-                    `| :---: | :---: | :---: |\n` +
-                    `| ${autoMergeChecks.fileCount} | ${prObject.data.base.repo.stargazers_count} | ${prObject.data.base.repo.forks} | `,
-            });
-
-            return context.github.issues.createComment(issueComment);
         }
     }
 };

@@ -7,6 +7,10 @@ const log = require("../functions/log.function");
 module.exports = async (context) => {
     context.logMe = log;
 
+    console.log(
+        "╔══════════════════════════════════════════════════════════════════════╗\n\n"
+    );
+
     context.log("⌨️ - PR EVENT", {
         event: context.event,
         action: context.payload.action,

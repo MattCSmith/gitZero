@@ -1,5 +1,4 @@
 module.exports = async (context) => {
-    console.log(context.payload.pull_request.user.login);
     const userName = context.payload.pull_request.user.login;
     const issueComment = context.issue({
         body:
