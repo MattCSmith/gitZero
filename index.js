@@ -14,4 +14,26 @@ module.exports = (app) => {
         // });
         // return context.github.issues.createComment(issueComment);
     });
+
+    // When a Repo is Created
+    // app.on("repository.created", async (context) => {
+    //     const team = await context.github.teams.getByName({
+    //         org: "zeroDevs",
+    //         team_slug: "Test",
+    //     });
+    //     console.log(team);
+    //     try {
+    //         context.github.teams.addOrUpdateRepo({
+    //             team_id: 3784195,
+    //             owner: "zeroDevs",
+    //             repo: "Test",
+    //             permission: "pull",
+    //         });
+    //     } catch (error) {
+    //         console.log;
+    //     }
+
+    //     // console.log(context.github, context.repo());
+    //     // return OpenIssueOnRepoCreation.analyze(context.github, context.repo(), context.payload, robot.log)
+    // });
 };

@@ -33,10 +33,23 @@ module.exports = async (context) => {
     if (prObject.data.mergeable === false) {
         addLabel(context, "Conflict Present");
         makeComment(context, "conflict");
-    } else if (prObject.data.mergeable === null) {
+    } else if (
+        prObject.data.mergeable === null &&
+        context.payload.action !== "labelled"
+    ) {
         context.logMe(
             context,
             "MERGABLE STATE UNKNOWN",
+            `The state of [this PR](${context.payload.pull_request.html_url}) is unknown!`,
+            10028130
+        );
+    } else if (
+        prObject.data.mergeable === null &&
+        context.payload.action === "labelled"
+    ) {
+        context.logMe(
+            context,
+            "STALE LABELLED - MERGABLE STATE UNKNOWN",
             `The state of [this PR](${context.payload.pull_request.html_url}) is unknown!`,
             10028130
         );
@@ -51,22 +64,28 @@ module.exports = async (context) => {
     //  2. Auto Merge PR, If criteria is met
     else {
         // 1. Lets remove the Conflict Label if one is present
-        // Removing a label will trigger an unlabel action, causing this to double run
-        if (context.payload.action !== "unlabeled") {
-            if (labelNames.includes("Conflict Present")) {
-                context.github.issues.removeLabel(
-                    context.issue({
-                        name: "Conflict Present",
-                    })
-                );
-                context.logMe(
-                    context,
-                    "REMOVING LABEL",
-                    `The \`Conflict Present\` label is being removed [this PR](${context.payload.pull_request.html_url})`,
-                    10028130
-                );
-            }
+        if (labelNames.includes("Conflict Present")) {
+            context.github.issues.removeLabel(
+                context.issue({
+                    name: "Conflict Present",
+                })
+            );
+            context.logMe(
+                context,
+                "REMOVING LABEL",
+                `The \`Conflict Present\` label is being removed [this PR](${context.payload.pull_request.html_url})`,
+                10028130
+            );
         }
+
+        // Lets prevent certain actions from triggering the messages below.
+        // We only really want to auto merge and send messages on
+        // Syncronize || Open action events
+        if (
+            context.payload.action !== "opened" ||
+            context.payload.action !== "synchronize"
+        )
+            return;
 
         // 2. Check if we should auto merge
         // The criteria is:
