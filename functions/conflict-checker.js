@@ -45,10 +45,13 @@ module.exports = async (context) => {
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
     //                  IF PULL REQ CONFLICT FREE                    //
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
-    // If the PR is mergable we should remove the conflict label and
-    // on certain repos, auto merge
+    // If the PR is mergable we should:
+    //  1. Remove the conflict label
+    //  2. Thank the user for their PR & Offer next steps
+    //  3. Auto Merge PR, If criteria is met
     else {
-        // Removing a label will trigger an unlabel action causing this to double run
+        // 1. Lets remove the Conflict Label if one is present
+        // Removing a label will trigger an unlabel action, causing this to double run
         if (context.payload.action !== "unlabeled") {
             if (labelNames.includes("Conflict Present")) {
                 context.github.issues.removeLabel(
@@ -65,13 +68,16 @@ module.exports = async (context) => {
             }
         }
 
-        // Thank the user for their PR and provide options
+        // 2. Thank the user for their PR and provide options
         prSuccess(context, prObject, autoMergeChecks);
 
-        // We only want to auto merge on the start here repo, return all others silently
-        if (context.payload.repository.name !== "start-here-guidelines") return;
-
-        // We now want to check a bunch of criteria, and comment any failures.
+        // 3. Check if we should auto merge
+        // The criteria is:
+        //  - No More than 3 line additions
+        //  - No more than 1 line deletion
+        //  - No more than 1 file can be changed
+        //  - Files changed must be in the whitelist
+        //  - Repo must be whitelisted
 
         // We need to fetch the files changed
         const filesChangedArray = await context.github.pulls
@@ -80,24 +86,31 @@ module.exports = async (context) => {
                 return data;
             });
 
+        // Create an object for the criteria and results
         const autoMergeChecks = {
             additions: prObject.data.additions,
             deletions: prObject.data.deletions,
             fileCount: filesChangedArray.data.length,
+            repo: context.payload.repository.name,
             fileNames: [],
             status: true,
         };
 
+        // Map out the file names and add them to the criteria Obj
         await filesChangedArray.data.map((file) =>
             autoMergeChecks.fileNames.push(file.filename)
         );
 
+        // Run the criteria Checks
         if (autoMergeChecks.additions > 3) autoMergeChecks.status = false;
         if (autoMergeChecks.deletions > 1) autoMergeChecks.status = false;
         if (autoMergeChecks.fileCount > 1) autoMergeChecks.status = false;
         if (!autoMergeChecks.fileNames.includes("CONTRIBUTORS.md"))
             autoMergeChecks.status = false;
+        if (!autoMergeChecks.repo.includes("start-here-guidelines"))
+            autoMergeChecks.status = false;
 
+        // If the checks pass, Log it and merge it
         if (autoMergeChecks.status) {
             context.github.pulls.merge(context.issue());
             context.logMe(
@@ -107,7 +120,7 @@ module.exports = async (context) => {
                 56782
             );
         } else {
-            // Log when a pull request cant be merged automatically
+            // Otherwise Log when a pull request cant be merged automatically
             context.logMe(
                 context,
                 "Unable To Auto-Merge PR\n",
