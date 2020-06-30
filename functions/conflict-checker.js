@@ -81,11 +81,7 @@ module.exports = async (context) => {
         // Lets prevent certain actions from triggering the messages below.
         // We only really want to auto merge and send messages on
         // Syncronize || Open action events
-        if (
-            context.payload.action !== "opened" ||
-            context.payload.action !== "synchronize"
-        )
-            return;
+        if (context.payload.action === "unlabelled") return;
 
         // 2. Check if we should auto merge
         // The criteria is:
